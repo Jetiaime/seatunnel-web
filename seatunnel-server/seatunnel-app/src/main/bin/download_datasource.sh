@@ -46,6 +46,7 @@ datasource_list=(
   "datasource-mongodb"
   "datasource-fakesource"
   "datasource-console"
+  "datasource-hdfs"
 )
 
 # the datasource default version is 1.0.0, you can also choose a custom version. eg: 1.1.2:  sh install-datasource.sh 2.1.2

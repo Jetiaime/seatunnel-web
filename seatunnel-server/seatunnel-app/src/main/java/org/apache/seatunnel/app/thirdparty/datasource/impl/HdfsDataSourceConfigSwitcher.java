@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.apache.seatunnel.app.thirdparty.datasource.impl;
 
 import org.apache.seatunnel.shade.com.typesafe.config.Config;
@@ -31,7 +14,7 @@ import org.apache.seatunnel.app.dynamicforms.FormStructure;
 import org.apache.seatunnel.app.thirdparty.datasource.AbstractDataSourceConfigSwitcher;
 import org.apache.seatunnel.app.thirdparty.datasource.DataSourceConfigSwitcher;
 import org.apache.seatunnel.common.constants.PluginType;
-import org.apache.seatunnel.datasource.plugin.s3.S3OptionRule;
+import org.apache.seatunnel.datasource.plugin.hdfs.HdfsOptionRule;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,13 +23,13 @@ import java.util.List;
 
 @Slf4j
 @AutoService(DataSourceConfigSwitcher.class)
-public class S3DataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
+public class HdfsDataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher {
 
-    public S3DataSourceConfigSwitcher() {}
+    public HdfsDataSourceConfigSwitcher() {}
 
     @Override
     public String getDataSourceName() {
-        return "S3";
+        return "Hdfs";
     }
 
     @Override
@@ -60,9 +43,9 @@ public class S3DataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher
             List<RequiredOption> addRequiredOptions,
             List<Option<?>> addOptionalOptions,
             List<String> excludedKeys) {
-        excludedKeys.add(S3OptionRule.PATH.key());
+        excludedKeys.add(HdfsOptionRule.PATH.key());
         if (PluginType.SOURCE.equals(pluginType)) {
-            excludedKeys.add(S3OptionRule.SCHEMA.key());
+            excludedKeys.add(HdfsOptionRule.SCHEMA.key());
         }
 
         return super.filterOptionRule(
@@ -86,100 +69,101 @@ public class S3DataSourceConfigSwitcher extends AbstractDataSourceConfigSwitcher
             BusinessMode businessMode,
             PluginType pluginType,
             Config connectorConfig) {
+
         if (PluginType.SOURCE.equals(pluginType)) {
             connectorConfig =
                     connectorConfig
                             .withValue(
-                                    S3OptionRule.SCHEMA.key(),
+                                    HdfsOptionRule.SCHEMA.key(),
                                     KafkaKingbaseDataSourceConfigSwitcher.SchemaGenerator
                                             .generateSchemaBySelectTableFields(
                                                     virtualTableDetail, selectTableFields)
                                             .root())
                             .withValue(
-                                    S3OptionRule.PATH.key(),
+                                    HdfsOptionRule.PATH.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.PATH.key())))
+                                                    .get(HdfsOptionRule.PATH.key())))
                             .withValue(
-                                    S3OptionRule.TYPE.key(),
+                                    HdfsOptionRule.FILE_FORMAT_TYPE.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.TYPE.key())))
+                                                    .get(HdfsOptionRule.FILE_FORMAT_TYPE.key())))
                             .withValue(
-                                    S3OptionRule.PARSE_PARSE_PARTITION_FROM_PATH.key(),
+                                    HdfsOptionRule.PARSE_PARTITION_FROM_PATH.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
                                                     .get(
-                                                            S3OptionRule
-                                                                    .PARSE_PARSE_PARTITION_FROM_PATH
+                                                            HdfsOptionRule.PARSE_PARTITION_FROM_PATH
                                                                     .key())))
                             .withValue(
-                                    S3OptionRule.DATE_FORMAT.key(),
+                                    HdfsOptionRule.DATE_FORMAT.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.DATE_FORMAT.key())))
+                                                    .get(HdfsOptionRule.DATE_FORMAT.key())))
                             .withValue(
-                                    S3OptionRule.DATETIME_FORMAT.key(),
+                                    HdfsOptionRule.DATETIME_FORMAT.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.DATETIME_FORMAT.key())))
+                                                    .get(HdfsOptionRule.DATETIME_FORMAT.key())))
                             .withValue(
-                                    S3OptionRule.TIME_FORMAT.key(),
+                                    HdfsOptionRule.TIME_FORMAT.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.TIME_FORMAT.key())));
+                                                    .get(HdfsOptionRule.TIME_FORMAT.key())));
         } else if (PluginType.SINK.equals(pluginType)) {
-            if (virtualTableDetail.getDatasourceProperties().get(S3OptionRule.PATH.key()) == null) {
+            if (virtualTableDetail.getDatasourceProperties().get(HdfsOptionRule.PATH.key())
+                    == null) {
                 throw new IllegalArgumentException("S3 virtual table path is null");
             }
             connectorConfig =
                     connectorConfig
                             .withValue(
-                                    S3OptionRule.PATH.key(),
+                                    HdfsOptionRule.PATH.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.PATH.key())))
+                                                    .get(HdfsOptionRule.PATH.key())))
                             .withValue(
-                                    S3OptionRule.TYPE.key(),
+                                    HdfsOptionRule.FILE_FORMAT_TYPE.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.TYPE.key())))
+                                                    .get(HdfsOptionRule.FILE_FORMAT_TYPE.key())))
                             .withValue(
-                                    S3OptionRule.PARSE_PARSE_PARTITION_FROM_PATH.key(),
+                                    HdfsOptionRule.PARSE_PARTITION_FROM_PATH.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
                                                     .get(
-                                                            S3OptionRule
-                                                                    .PARSE_PARSE_PARTITION_FROM_PATH
+                                                            HdfsOptionRule.PARSE_PARTITION_FROM_PATH
                                                                     .key())))
                             .withValue(
-                                    S3OptionRule.DATE_FORMAT.key(),
+                                    HdfsOptionRule.DATE_FORMAT.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.DATE_FORMAT.key())))
+                                                    .get(HdfsOptionRule.DATE_FORMAT.key())))
                             .withValue(
-                                    S3OptionRule.DATETIME_FORMAT.key(),
+                                    HdfsOptionRule.DATETIME_FORMAT.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.DATETIME_FORMAT.key())))
+                                                    .get(HdfsOptionRule.DATETIME_FORMAT.key())))
                             .withValue(
-                                    S3OptionRule.TIME_FORMAT.key(),
+                                    HdfsOptionRule.TIME_FORMAT.key(),
                                     ConfigValueFactory.fromAnyRef(
                                             virtualTableDetail
                                                     .getDatasourceProperties()
-                                                    .get(S3OptionRule.TIME_FORMAT.key())));
+                                                    .get(HdfsOptionRule.TIME_FORMAT.key())));
         }
+
         return super.mergeDatasourceConfig(
                 dataSourceInstanceConfig,
                 virtualTableDetail,
